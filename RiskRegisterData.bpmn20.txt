@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="riskregisterdata" name="RiskRegister" isExecutable="true">
+    <documentation>Risk Register data Review</documentation>
+    <startEvent id="startevent" name="Start event" flowable:formFieldValidation="true"></startEvent>
+    <userTask id="rolloveruser" name="Roll Over User" flowable:formFieldValidation="true"></userTask>
+    <sequenceFlow id="sid-9DD55BF1-6D9E-4220-8B2C-7B41E8F549D9" sourceRef="startevent" targetRef="rolloveruser"></sequenceFlow>
+    <serviceTask id="reviewer" name="Reviewer" flowable:class="org.flowable.flowholi.delegates.RiskRegisterReviewerHandler"></serviceTask>
+    <sequenceFlow id="sid-E386E6C3-8839-4743-AE7F-0F971CA8F1C1" sourceRef="rolloveruser" targetRef="reviewer"></sequenceFlow>
+    <exclusiveGateway id="approvereject" />
+          <sequenceFlow sourceRef="approvereject" targetRef="processafterapproval">
+               <conditionExpression xsi:type="tFormalExpression">
+                   <![CDATA[${approved}]]>
+               </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="approvereject" targetRef="reviewer">
+            <conditionExpression xsi:type="tFormalExpression">
+              <![CDATA[${!approved}]]>
+            </conditionExpression>
+        </sequenceFlow>
+    
+    <endEvent id="endevent" name="End Event"></endEvent>
+    <sequenceFlow id="sid-B7C83DAB-5736-4E01-8327-8356052BA08F" sourceRef="reviewer" targetRef="decisionmanager"></sequenceFlow>
+    <userTask id="decisionmanager" name="Decision Manager" flowable:formFieldValidation="true" flowable:candidateGroups="managers" />
+    <sequenceFlow id="sid-4DCAB75D-8E4A-4A65-BFC9-2B72BAEE0571" sourceRef="decisionmanager" targetRef="approvereject"></sequenceFlow>
+    <sequenceFlow id="sid-91C49C43-BC4A-4FC7-8F38-3F9C90949331" name="Rejected" sourceRef="approvereject" targetRef="reviewer"></sequenceFlow>
+    <serviceTask id="processafterapproval" name="process after approval" flowable:class="org.flowable.flowholi.delegates.RiskRegisterApprovalHandler"></serviceTask>
+    <sequenceFlow id="sid-EF7D355C-5665-4492-A0F3-25F56ACD95B4" sourceRef="processafterapproval"  targetRef="endevent"></sequenceFlow>
+    <sequenceFlow id="sid-B49F7FFB-43F7-43FF-A8FC-0BC9955BC109" name="Approved" sourceRef="approvereject"  targetRef="processafterapproval"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_riskregisterdata">
+    <bpmndi:BPMNPlane bpmnElement="riskregisterdata" id="BPMNPlane_riskregisterdata">
+      <bpmndi:BPMNShape bpmnElement="startevent" id="BPMNShape_startevent">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rolloveruser" id="BPMNShape_rolloveruser">
+        <omgdc:Bounds height="80.0" width="100.0" x="219.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewer" id="BPMNShape_reviewer">
+        <omgdc:Bounds height="80.0" width="100.0" x="421.0" y="137.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvereject" id="BPMNShape_approvereject">
+        <omgdc:Bounds height="40.0" width="40.0" x="451.0" y="324.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent" id="BPMNShape_endevent">
+        <omgdc:Bounds height="28.0" width="28.0" x="101.0" y="333.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="decisionmanager" id="BPMNShape_decisionmanager">
+        <omgdc:Bounds height="80.0" width="100.0" x="675.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="processafterapproval" id="BPMNShape_processafterapproval">
+        <omgdc:Bounds height="80.0" width="100.0" x="219.0" y="307.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-B7C83DAB-5736-4E01-8327-8356052BA08F" id="BPMNEdge_sid-B7C83DAB-5736-4E01-8327-8356052BA08F">
+        <omgdi:waypoint x="520.95" y="177.1966535433071"></omgdi:waypoint>
+        <omgdi:waypoint x="674.9999999999969" y="177.8031496062992"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-B49F7FFB-43F7-43FF-A8FC-0BC9955BC109" id="BPMNEdge_sid-B49F7FFB-43F7-43FF-A8FC-0BC9955BC109">
+        <omgdi:waypoint x="451.74390243902394" y="344.7432926829268"></omgdi:waypoint>
+        <omgdi:waypoint x="318.95000000000005" y="346.38271604938274"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-91C49C43-BC4A-4FC7-8F38-3F9C90949331" id="BPMNEdge_sid-91C49C43-BC4A-4FC7-8F38-3F9C90949331">
+        <omgdi:waypoint x="471.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="471.0" y="216.95000000000002"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-EF7D355C-5665-4492-A0F3-25F56ACD95B4" id="BPMNEdge_sid-EF7D355C-5665-4492-A0F3-25F56ACD95B4">
+        <omgdi:waypoint x="219.0" y="347.0"></omgdi:waypoint>
+        <omgdi:waypoint x="128.94992649102042" y="347.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-4DCAB75D-8E4A-4A65-BFC9-2B72BAEE0571" id="BPMNEdge_sid-4DCAB75D-8E4A-4A65-BFC9-2B72BAEE0571">
+        <omgdi:waypoint x="725.0" y="217.95000000000002"></omgdi:waypoint>
+        <omgdi:waypoint x="725.0" y="344.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.9039090192641" y="344.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E386E6C3-8839-4743-AE7F-0F971CA8F1C1" id="BPMNEdge_sid-E386E6C3-8839-4743-AE7F-0F971CA8F1C1">
+        <omgdi:waypoint x="318.95000000000005" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.99999999999636" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-9DD55BF1-6D9E-4220-8B2C-7B41E8F549D9" id="BPMNEdge_sid-9DD55BF1-6D9E-4220-8B2C-7B41E8F549D9">
+        <omgdi:waypoint x="129.94999922936606" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="218.99999999999153" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

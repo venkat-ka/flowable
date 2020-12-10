@@ -1,0 +1,9 @@
+@Data
+public class RiskRegisterRequest {
+ 
+	 private String name;
+	 
+	 private String data;
+	 
+	 private String status;
+}

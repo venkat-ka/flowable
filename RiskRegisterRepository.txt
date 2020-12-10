@@ -1,0 +1,3 @@
+public interface RiskRegisterRepository extends JpaRepository<Riskregister, Long>{
+
+}

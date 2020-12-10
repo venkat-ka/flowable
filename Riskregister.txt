@@ -1,0 +1,24 @@
+@Entity(name="riskregister")
+@Data @NoArgsConstructor
+public class Riskregister implements Serializable{
+	
+	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8294646125109221895L;
+
+	@Id
+	 @GeneratedValue
+	 private Long id;
+	 
+	 @Column(nullable = false, length=50)
+	 private String name;
+	 
+	 @Column(nullable = false, length=50)
+	 private String data;
+	 
+	 @Column(nullable = false, length=20)
+	 private String status;
+	 
+	
+}
