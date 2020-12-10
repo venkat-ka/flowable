@@ -1,0 +1,49 @@
+
+@RestController
+@RequestMapping("/riskregist")
+@FieldDefaults(level=AccessLevel.PRIVATE)
+@AllArgsConstructor
+public class RiskRegisterController {
+	
+	@Autowired
+	RiskRegisterService riskregisterservice;
+	
+    @PostMapping("/deploy")
+    public void deployWorkflow() {
+    	riskregisterservice.deployProcessDefinition();
+    }
+    
+  //********************************************************** process endpoints **********************************************************
+    @PostMapping("/apply")
+    public ProcessInstanceResponse applyRiskregister(@RequestBody RiskRegisterRequest riskregisterrequest) {
+        return riskregisterservice.applyRiskregister(riskregisterrequest);
+    }
+    
+    @GetMapping("/manager/tasks")
+    public List<TaskDetails> getTasks() {
+        return riskregisterservice.getManagerTasks();
+    }
+    
+    @PostMapping("/manager/approve/tasks/{taskId}/{approved}")
+    public void approveTask(@PathVariable("taskId") String taskId,@PathVariable("approved") Boolean approved){
+        riskregisterservice.approveRiskRegister(taskId,approved);
+    }
+    
+    
+    @PostMapping("/user/accept/{taskId}")
+    public void acceptHoliday(@PathVariable("taskId") String taskId){
+    	riskregisterservice.acceptRiskRegister(taskId);
+    }
+    
+    @GetMapping("/user/tasks")
+    public List<TaskDetails> getUserTasks() {
+        return riskregisterservice.getUserTasks();
+    }
+    
+    @GetMapping("/process/{processId}")
+    public void checkState(@PathVariable("processId") String processId){
+    	riskregisterservice.checkProcessHistory(processId);
+    }
+
+    
+}

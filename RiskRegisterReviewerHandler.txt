@@ -1,0 +1,11 @@
+@Data
+@Slf4j
+public class RiskRegisterReviewerHandler implements JavaDelegate {
+	
+	@Override
+    public void execute(DelegateExecution execution) {
+
+        log.info("Risk Register Reviewed");
+
+    }
+}

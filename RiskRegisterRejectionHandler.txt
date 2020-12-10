@@ -1,0 +1,8 @@
+public class RiskRegisterApprovalHandler implements JavaDelegate  {
+	
+	@Override
+    public void execute(DelegateExecution execution) {
+
+        System.out.println("Risk Register Data Approved");
+    }
+}
