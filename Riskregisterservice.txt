@@ -1,0 +1,106 @@
+
+@Service
+public class RiskRegisterService {
+	
+	
+	RuntimeService runtimeService;
+    TaskService taskService;
+    ProcessEngine processEngine;
+    RepositoryService repositoryService;
+    
+    @Value( "${xml.locatore}" )
+    private String registerlocate;
+    
+    public static final String TASK_CANDIDATE_GROUP = "managers";
+    // ** Process Definition Key in bpmn id **
+    public static final String PROCESS_DEFINITION_KEY = "riskregisterdata";
+    
+    public static final String NAME = "name";
+
+    //********************************************************** deployment service methods **********************************************************
+
+    public void deployProcessDefinition() {
+    	System.out.println(registerlocate);
+        Deployment deployment =
+                repositoryService
+                        .createDeployment()
+                        .addClasspathResource(registerlocate)
+                        .deploy();
+
+
+    }
+    
+    //********************************************************** process service methods **********************************************************
+
+    public ProcessInstanceResponse applyRiskregister(RiskRegisterRequest riskregisterrequest) {
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("name", riskregisterrequest.getName());
+        variables.put("data", riskregisterrequest.getData());
+        variables.put("status", riskregisterrequest.getStatus());
+
+        ProcessInstance processInstanceData =
+                runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
+        ProcessInstanceResponse processInt = new ProcessInstanceResponse();
+        processInt.setId(processInstanceData.getId());
+        processInt.isEnded();
+        return processInt;
+    }
+    
+    public List<TaskDetails> getManagerTasks() {
+        List<Task> tasks =
+                taskService.createTaskQuery().taskCandidateGroup(TASK_CANDIDATE_GROUP).list();
+        List<TaskDetails> taskDetails = getTaskDetails(tasks);
+
+        return taskDetails;
+    }
+    
+    private List<TaskDetails> getTaskDetails(List<Task> tasks) {
+        List<TaskDetails> taskDetails = new ArrayList<>();
+        for (Task task : tasks) {
+            Map<String, Object> processVariables = taskService.getVariables(task.getId());
+            taskDetails.add(new TaskDetails(task.getId(), task.getName(), processVariables));
+        }
+        return taskDetails;
+    }
+    
+    public void approveRiskRegister(String taskId,Boolean approved) {
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("approved", approved.booleanValue());
+        taskService.complete(taskId, variables);
+    }
+    
+    public void acceptRiskRegister(String taskId) {
+        taskService.complete(taskId);
+    }
+    
+    public List<TaskDetails> getUserTasks() {
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateOrAssigned(NAME).list();
+        List<TaskDetails> taskDetails = getTaskDetails(tasks);
+
+        return taskDetails;
+    }
+    
+    public void checkProcessHistory(String processId) {
+
+        HistoryService historyService = processEngine.getHistoryService();
+
+        List<HistoricActivityInstance> activities =
+                historyService
+                        .createHistoricActivityInstanceQuery()
+                        .processInstanceId(processId)
+                        .finished()
+                        .orderByHistoricActivityInstanceEndTime()
+                        .asc()
+                        .list();
+
+        for (HistoricActivityInstance activity : activities) {
+            System.out.println(
+                    activity.getActivityId() + " took " + activity.getDurationInMillis() + " milliseconds");
+        }
+
+        System.out.println("\n \n \n \n");
+    }
+}
